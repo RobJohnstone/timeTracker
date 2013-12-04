@@ -1,0 +1,28 @@
+body {
+	padding: 0;
+	margin: 0;
+}
+
+.timelineDays {
+	width: 100%;
+	margin: 0;
+	border-collapse: collapse;
+}
+
+.timelineDays td {
+	background-color: rgb(144, 170, 255);
+	text-align: center;
+	border-style: solid;
+	border-width: 1px;
+	border-color: rgb(118, 156, 255);
+}
+
+.timelineDays td:hover {
+	background-color: rgb(107, 141, 255);
+	cursor: pointer;
+}
+
+.timelineLeft,
+.timelineRight {
+	width: 50px
+}
