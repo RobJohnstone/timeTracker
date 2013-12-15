@@ -1,6 +1,6 @@
 <?php
 
-$numDays = 5;
+$numDays = 60;
 $day = new DateTime();
 $day->sub(new DateInterval('P'.floor($numDays/2).'D'));
 $start = $day->format('Y-m-d');

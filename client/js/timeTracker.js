@@ -3,9 +3,25 @@ var ATT = ATT || {};
 (function(ATT) {
 	"use strict";
 
-	var DayPage = function(selector, date) {
+	ATT.applicationController = function(state) {
+		var currentState = state || 'day';
+		ATT.globalevents.on('applicationStateChange', function(event) {
+			if (event.state !== currentState) {
+				$('.'+currentState+'Container').hide();
+				$('.'+event.state+'Container').show();
+				currentState = event.state;
+			}
+		});
+	};
+
+})(ATT);
+
+(function(ATT) {
+	"use strict";
+
+	var DayPage = function(date) {
 		date = date || new Date();
-		this._jContainer = $(selector);
+		this._jContainer = $('.dayContainer');
 		this._jDate = this._jContainer.find('.date');
 		this._jDescription = this._jContainer.find('.dayDescription');
 		this._setDate(date, function() {
@@ -17,6 +33,7 @@ var ATT = ATT || {};
 	DayPage.prototype._initialiseDom = function() {
 		this._jDate.text(ATT.date.prettyDate(this._date));
 		this._jDescription.val(this._dayObj.description);
+		this._jDescription.focus();
 	};
 
 	DayPage.prototype._setDate = function(date, callback) {
@@ -64,35 +81,165 @@ var ATT = ATT || {};
 (function(ATT) {
 	"use strict";
 
-	var Timeline  = function(date) {
+	var WeekPage = function(date) {
+		date = date || new Date();
+		this._jContainer = $('.weekContainer');
+		this._jDate = this._jContainer.find('.dateContainer .date');
+		this._setDate(date, function() {
+			this._initialiseDom();
+			this._initialiseEvents();
+		}.bind(this));
+	};
+
+	WeekPage.prototype._initialiseDom = function() {
+		var jTable = this._jContainer.find('.weekTable'),
+			description;
+		jTable.html('<tbody><tr><th>Date</th><th>Tasks</th></tr></tbody>');
+		this._jDate.text(ATT.date.prettyDate(this._date));
+		this._weekArr.forEach(function(day) {
+			description = day.description || '';
+			jTable.append('<tr><td>'+ATT.date.getLongDay(day.date)+'</td><td>'+description+'</td></tr>');
+		});
+	};
+
+	WeekPage.prototype._setDate = function(date, callback) {
+		var weekStart = ATT.date.offsetWeek(date, date.getDay() -1);
+		this._date = weekStart;
+		ATT.days.getDays(weekStart, 7, function(week) {
+			this._weekArr = week;
+			if (callback) callback();
+		}.bind(this));
+	};
+
+	WeekPage.prototype._initialiseEvents = function() {
+		ATT.globalevents.on('dateChanged', this._handleDateChanged.bind(this));
+	};
+
+	WeekPage.prototype._removeEvents = function() {
+		/*ATT.globalevents.off('dateChanged', this._handleDateChanged);*/
+	};
+
+	WeekPage.prototype._handleDateChanged = function(event) {
+		this.changeDate(event.date);
+	};
+
+	WeekPage.prototype.changeDate = function(date) {
+		this._setDate(date, function() {
+			this._initialiseDom();
+		}.bind(this));
+	};
+
+	ATT.WeekPage = WeekPage;
+
+})(ATT);
+
+(function(ATT) {
+	"use strict";
+
+	var MonthPage = function(date) {
+		date = date || new Date();
+		this._jContainer = $('.monthContainer');
+		this._jDate = this._jContainer.find('.dateContainer .date');
+		this._setDate(date, function() {
+			this._initialiseDom();
+			this._initialiseEvents();
+		}.bind(this));
+	};
+
+	MonthPage.prototype._initialiseDom = function() {
+		var jTable = this._jContainer.find('.monthTable');
+		jTable.html('<tbody><tr><th>Date</th><th>Tasks</th></tr></tbody>');
+		this._jDate.text(ATT.date.getLongMonth(this._date)+' '+this._date.getFullYear());
+		this._monthArr.forEach(function(day) {
+			if (day.description) {
+				jTable.append('<tr><td>'+day.date+'</td><td>'+day.description+'</td></tr>');
+			}
+		});
+	};
+
+	MonthPage.prototype._setDate = function(date, callback) {
+		var monthStart = ATT.date.offsetMonth(date, 0);
+		this._date = monthStart;
+		ATT.days.getMonth(monthStart, function(month) {
+			this._monthArr = month;
+			if (callback) callback();
+		}.bind(this));
+	};
+
+	MonthPage.prototype._initialiseEvents = function() {
+		ATT.globalevents.on('dateChanged', this._handleDateChanged.bind(this));
+	};
+
+	MonthPage.prototype._removeEvents = function() {
+		/*ATT.globalevents.off('dateChanged', this._handleDateChanged);*/
+	};
+
+	MonthPage.prototype._handleDateChanged = function(event) {
+		this.changeDate(event.date);
+	};
+
+	MonthPage.prototype.changeDate = function(date) {
+		this._setDate(date, function() {
+			this._initialiseDom();
+		}.bind(this));
+	};
+
+	ATT.MonthPage = MonthPage;
+
+})(ATT);
+
+(function(ATT) {
+	"use strict";
+
+	var Timeline  = function(date, period) {
+		this._period = period || 'day';
 		this._jContainer = $('.timeline');
 		this._currentDate = date || new Date();
-		if (date) this._intialiseDom(date);
+		this._initialiseDom(this._currentDate);
 		this._initialiseEvents();
 	};
 
 	Timeline.prototype._initialiseDom = function(date) {
-		var jDays = this._jContainer.find('.day'),
-			numDays = jDays.length,
-			dayInterval = 24 * 60 * 60 * 1000;
-		jDays.each(function(index) {
-			var offset = index - Math.floor(numDays/2),
-				thisDate = new Date(date.valueOf() + (offset * dayInterval));
-			$(this).text(ATT.date.apiDate(thisDate))
+		var jPeriods = this._jContainer.find('.timelinePeriod'),
+			numPeriods = jPeriods.length,
+			period = this._period;
+		jPeriods.each(function(index, elm) {
+			var offset = index - Math.floor(numPeriods/2),
+				thisDate = ATT.date.offsetDate(date, offset, period);
+			$(elm).text(this.renderPeriod(thisDate))
 					.attr('id', 'timeline_day_'+thisDate.toString());
-		});
+		}.bind(this));
 	};
 
-	Timeline.prototype._setDate = function(date) {
+	Timeline.prototype.renderPeriod = function(date) {
+		var currentDate = new Date(this._currentDate.getTime());
+		switch (this._period) {
+			case 'day':
+				return ATT.date.apiDate(date);
+			case 'week':
+				return ATT.date.apiDate(date);
+			case 'month':
+				return ATT.date.getLongMonth(date);
+		}
+	};
+
+	Timeline.prototype._setDate = function(date, period) {
 		this._currentDate = date;
+		this._period = period || this._period || 'day';
 		ATT.globalevents.fire('dateChanged', {date: date});
 	};
 
-	Timeline.prototype._initialiseEvents = function() {
-		this._jContainer.on('click', '.day', this._handleDayClick.bind(this));
+	Timeline.prototype._handlePeriodChanged = function(event) {
+		this._period = event.period;
+		this._initialiseDom(this._currentDate);
 	};
 
-	Timeline.prototype._handleDayClick = function(event) {
+	Timeline.prototype._initialiseEvents = function() {
+		this._jContainer.on('click', '.timelinePeriod', this._handleTimelineClick.bind(this));
+		ATT.globalevents.on('timePeriodChanged', this._handlePeriodChanged.bind(this));
+	};
+
+	Timeline.prototype._handleTimelineClick = function(event) {
 		var target = $(event.currentTarget),
 			dateString = target.attr('id').split('_')[2],
 			date = new Date(dateString);
@@ -107,11 +254,63 @@ var ATT = ATT || {};
 (function(ATT) {
 	"use strict";
 
+	var TimePeriodBar = function(period) {
+		this._period = period || 'day';
+		this._initialiseDom();
+		this.highlightPeriod();
+		this._initialiseEvents();
+	};
+
+	TimePeriodBar.prototype._initialiseDom = function() {
+		this.jContainer = $('.timePeriodBar');
+	};
+
+	TimePeriodBar.prototype._initialiseEvents = function() {
+		this.jContainer.on('click', '.timePeriod', this._handleTimePeriodClicked.bind(this));
+	};
+
+	TimePeriodBar.prototype._handleTimePeriodClicked = function(event) {
+		var jPeriod = $(event.currentTarget),
+			period = jPeriod.attr('id').split('_')[1];
+		this._handleTimePeriodChanged({period: period});
+		ATT.globalevents.fire('timePeriodChanged', {
+			period: period
+		});
+		ATT.globalevents.fire('applicationStateChange', {
+			state: period
+		});
+	};
+
+	TimePeriodBar.prototype._handleTimePeriodChanged = function(event) {
+		this._period = event.period;
+		this.highlightPeriod();
+	};
+
+	TimePeriodBar.prototype.highlightPeriod = function() {
+		this.jContainer.find('.timePeriod').removeClass('highlighted');
+		this.jContainer.find('.'+this._period).addClass('highlighted');
+	};
+
+	ATT.TimePeriodBar = TimePeriodBar;
+})(ATT);
+
+(function(ATT) {
+	"use strict";
+
 	ATT.date = {
-		days: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+		days: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
+		longDays: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
 		months: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+		longMonths: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
 		prettyDate: function(date) {
-			return this.days[date.getDay()]+' '+this.addOrdinal(date.getDate())+' '+this.months[date.getMonth()]+' '+date.getFullYear();
+			return this.days[date.getDay()]+', '+this.addOrdinal(date.getDate())+' '+this.months[date.getMonth()]+' '+date.getFullYear();
+		},
+		getLongDay: function(date) {
+			date = (date.getDay) ? date : new Date(date);
+			return this.longDays[date.getDay()];
+		},
+		getLongMonth: function(date) {
+			return this.longMonths[date.getMonth()];
 		},
 		addOrdinal: function(date) {
 			var ordinal = 'th';
@@ -131,6 +330,32 @@ var ATT = ATT || {};
 		},
 		twoDigit: function(number) {
 			return number < 10 ? '0'+number : number;
+		},
+		offsetDate: function(date, offset, period) {
+			switch (period) {
+				case 'day':
+					return this.offsetDay(date, offset);
+				case 'week':
+					return this.offsetWeek(date, offset);
+				case 'month':
+					return this.offsetMonth(date, offset);
+			}
+		},
+		offsetDay: function(date, offset) {
+			var newDate = new Date(date.getTime());
+			newDate.setDate(newDate.getDate() + offset);
+			return newDate;
+		},
+		offsetWeek: function(date, offset) {
+			var newDate = new Date(date.getTime());
+			newDate.setDate(newDate.getDate() - newDate.getDay() + 1 + (offset * 7));
+			return newDate;
+		},
+		offsetMonth: function(date, offset) {
+			var newDate = new Date(date.getTime());
+			newDate.setDate(1); // we want first day of the month
+			newDate.setMonth(newDate.getMonth() + offset);
+			return newDate;
 		}
 	};
 
@@ -234,15 +459,39 @@ var ATT = ATT || {};
 (function(ATT) {
 	"use strict";
 
-	var _dateBuffer = 2;
+	var _dateBuffer = 31;
 
 	ATT.days = {
 		get: function(date, callback) {
 			var dateString = (typeof date === 'string') ? date : ATT.date.apiDate(date);
 			return ATT.data.get('day', dateString, callback);
 		},
-		set: function(date, obj) {
-			ATT.data.set('day', date, obj);
+		set: function(date, obj, noAjax) {
+			ATT.data.set('day', date, obj, noAjax);
+		},
+		getDays: function(startDate, numDays, callback) {
+			var date, dateString, days = [], completed = 0;
+			for (var i=0; i<numDays; i++) {
+				date = ATT.date.offsetDay(startDate, i);
+				dateString = ATT.date.apiDate(date);
+				ATT.data.get('day', dateString, success);
+			}
+
+			function success(day) {
+				days.push(day);
+				completed++;
+				if (completed === numDays) {
+					if (typeof callback === 'function') callback(days);
+				}
+			}
+		},
+		getMonth: function(date, callback) {
+			var monthStart = ATT.date.offsetMonth(date, 0),
+				monthEnd = ATT.date.offsetMonth(date, 1),
+				daysInMonth;
+			monthEnd.setDate(0);
+			daysInMonth = monthEnd.getDate();
+			this.getDays(monthStart, daysInMonth, callback);
 		}
 	};
 
@@ -262,32 +511,38 @@ var ATT = ATT || {};
 			}
 		}
 
-		$.ajax({
-			url: window.location.href,
-			data: {'specificDays': JSON.stringify(days)},
-			success: function(result) {
-				var days = JSON.parse(result),
-					date,
-					dates = [];
-				for (date in days) {
-					if (days.hasOwnProperty(date)) {
-						ATT.days.set(date, days[date]);
-						dates.push({
-							namespace: 'day',
-							property: date,
-							value: days[date]
-						});
+		if (days.length) {
+			$.ajax({
+				url: window.location.href,
+				data: {'specificDays': JSON.stringify(days)},
+				success: function(result) {
+					var days = JSON.parse(result),
+						date,
+						dates = [];
+					for (date in days) {
+						if (days.hasOwnProperty(date)) {
+							ATT.days.set(date, days[date], true);
+							dates.push({
+								namespace: 'day',
+								property: date,
+								value: days[date]
+							});
+						}
 					}
+					ATT.globalevents.fire('dataNamespaceUpdated', dates);
 				}
-				ATT.globalevents.fire('dataNamespaceUpdated', dates);
-			}
-		});
+			});
+		}
 	});
 
 
 })(ATT);
 
 $(function() {
-	new ATT.DayPage('.dayContainer');
+	new ATT.DayPage();
+	new ATT.WeekPage();
+	new ATT.MonthPage();
 	new ATT.Timeline();
+	new ATT.TimePeriodBar();
+	ATT.applicationController();
 });

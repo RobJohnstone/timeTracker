@@ -16,6 +16,14 @@ class DaysCollection {
 		}
 	}
 
+	public function get($date) {
+		if ($this->days[$date]) {
+			return $this->days[$date];
+		} else {
+			return false;
+		}
+	}
+
 	public function toJSON() {
 		return json_encode($this->days);
 	}
