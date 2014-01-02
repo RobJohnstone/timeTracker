@@ -1,0 +1,4 @@
+RewriteEngine On
+RewriteRule ^api/(.*) server/api.php [L]
+RewriteCond %{ENV:REDIRECT_STATUS} ^$
+RewriteRule (.*) client/app/$1 [L]

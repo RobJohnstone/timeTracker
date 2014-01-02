@@ -1,0 +1,19 @@
+<h1>
+	<a href="#/month/{{prevMonth}}" class="headerLink"><i class="icon-arrow-left"></i></a> {{date | date:'MMMM yyyy'}} <a href="#/month/{{nextMonth}}" class="headerLink"><i class="icon-arrow-right"></i></a>
+</h1>
+<div class="large-50 push-center">
+	<ul class="unstyled vertical-space monthSummaryContent">
+		<li ng-repeat="(date, dayTasks) in tasks">
+			<div class="column-group">
+				<div class="extralarge large-25">
+					<p class="ink-label info invert">{{date}}</p>
+				</div>
+				<div class="large-75">
+					<ul class="unstyled push-left">
+						<li class="content-left" ng-repeat="task in dayTasks">{{task.task}}</li>
+					</ul>
+				</div>
+			</div>
+		</li>
+	</ul>
+</div>

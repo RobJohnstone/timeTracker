@@ -45,7 +45,6 @@ class Datastore{
             throw new DatastoreException('Error preparing statement in datastore->prepare(): '.$e->getMessage());
             return false;
         }
-        die("$sql\n");
     }
 
     public function execute($stmt, $params) {
@@ -54,6 +53,7 @@ class Datastore{
             $error = $stmt->errorInfo();
             throw new DatastoreException('execute unsuccessful in datastore->execute(): '.$error[2]);
         }
+        return $result;
     }
 }
 
