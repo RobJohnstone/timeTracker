@@ -1,18 +1,25 @@
 <h1><a href="#/day/{{prevDay}}"><i class="icon-arrow-left"></i></a> {{date | date:'fullDate'}} <a href="#/day/{{nextDay}}"><i class="icon-arrow-right"></i></a></h1>
 <div class="large-50 push-center">
-	<form class="ink-form">
-		<ul class="unstyled vertical-space">
-			<li ng-repeat="task in tasks">
-				<input class="extralarge large-100" type="text" ng-model="task.task" ng-change="saveTask($index)" />
-			</li>
-		</ul>
-	</form>
-	<form class="ink-form push-center" ng-submit="addTask()">
-		<div class="control-group">
-			<div class="control append-button extralarge">
-				<span><input type="text" ng-model="newTask" placeholder="Add task" /></span>
-				<button class="ink-button"><i class="icon-plus"></i> Add</button>
-			</div>
-		</div>
-	</form>
+    <form class="ink-form">
+        <div class="control-group">
+            <ul class="unstyled vertical-space">
+                <li class="taskItem" ng-repeat="task in tasks">
+                    <div class="control append-symbol taskInputControl">
+                        <span>
+                            <input class="large-100 extralarge taskInput" type="text" ng-model="task.task" ng-change="saveTask($index)" />
+                            <i class="icon-trash extralarge deleteTask" ng-class="{notReady: task.id===undefined}" ng-click="deleteTask($index)"></i>
+                        </span>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </form>
+    <form class="ink-form push-center" ng-submit="addTask()">
+        <div class="control-group">
+            <div class="control append-button extralarge">
+                <span><input type="text" ng-model="newTask" placeholder="Add task" /></span>
+                <button class="ink-button"><i class="icon-plus"></i> Add</button>
+            </div>
+        </div>
+    </form>
 </div>

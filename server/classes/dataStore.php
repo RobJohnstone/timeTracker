@@ -55,6 +55,10 @@ class Datastore{
         }
         return $result;
     }
+
+    public function lastInsertId() {
+        return $this->dbConn->lastInsertId();
+    }
 }
 
 class DatastoreException extends Exception {}

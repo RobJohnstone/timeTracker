@@ -1,7 +1,31 @@
 ul.unstyled ul.unstyled {
-	list-style: none;
+    list-style: none;
 }
 
 .monthSummaryContent {
-	background-color: #E5F4FF;
+    background-color: #E5F4FF;
+}
+
+.ink-form input.taskInput {
+    border: 0 none;
+}
+
+.taskInputControl .deleteTask {
+    display: none;
+}
+
+.taskInputControl:hover .deleteTask {
+    display: inline;
+}
+
+.deleteTask:hover {
+    cursor: pointer;
+}
+
+i.notReady {
+    opacity: 0.3;
+}
+
+i.notReady:hover {
+    cursor: wait;
 }

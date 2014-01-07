@@ -5,7 +5,7 @@ require_once('settings.php');
 
 switch ($params[0]) {
 	case 'tasks':
-		Tasks::handleRequest($params);
+		die(Tasks::handleRequest($params));
 		break;
 	default:
 		die('Invalid parameter: '.$params[0]);
