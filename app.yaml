@@ -6,12 +6,19 @@ threadsafe: false
 
 handlers:
 - url: /api/.*
-  script: timeTracker.application
+  script: api.application
 
 - url: /
-  static_files: client/app/index.html
-  upload: client/app/index.html
+  script: timeTracker.application
+  #static_files: client/app/index.html
+  #upload: client/app/index.html
 
 - url: /(.*)
   static_files: client/app/\1
   upload: client/app/(.*)
+
+libraries:
+- name: webapp2
+  version: latest
+- name: jinja2
+  version: latest
