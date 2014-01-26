@@ -1,0 +1,17 @@
+application: timetracker
+version: 1
+runtime: python27
+api_version: 1
+threadsafe: false
+
+handlers:
+- url: /api/.*
+  script: timeTracker.application
+
+- url: /
+  static_files: client/app/index.html
+  upload: client/app/index.html
+
+- url: /(.*)
+  static_files: client/app/\1
+  upload: client/app/(.*)

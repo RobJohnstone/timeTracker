@@ -2,6 +2,11 @@ ul.unstyled ul.unstyled {
     list-style: none;
 }
 
+a:hover, a .icon-arrow-left:hover {
+	color: #FFAD00;
+	text-decoration: none;
+}
+
 .monthSummaryContent {
     background-color: #E5F4FF;
 }
