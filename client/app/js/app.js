@@ -2,7 +2,8 @@
 
 var timeTracker = angular.module('timeTracker', [
     'ngRoute',
-    'ngAnimate'
+    'ngAnimate',
+    'ngCookies'
 ]);
 
 timeTracker.config(['$routeProvider', 
@@ -26,3 +27,13 @@ timeTracker.config(['$routeProvider',
                 redirectTo: '/day/'
             });
     }]);
+
+timeTracker.controller('menuCtrl', ['$scope', '$http', '$cookies',
+    function($scope, $http, $cookies) {
+        $scope.logout = function() {
+            $http.post('api/logout/').success(function() {
+                location.reload();
+            });
+            delete $cookies.session;
+        };
+}]);

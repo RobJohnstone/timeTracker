@@ -1,0 +1,41 @@
+<h1 class="vertical-space">Login to TimeTracker</h1>
+<div class="large-50 push-center">
+	<form id="loginForm" name="loginForm" novalidate class="ink-form" action="">
+		<div class="ink-alert basic error" ng-show="invalid">
+			<button class="ink-dismiss" ng-click="dismissError()">&times;</button>
+			<p>{{invalid}}</p>
+		</div>
+		<div class="control-group column-group gutters">
+			<label for="email" class="large-30 content-right">Email Address:</label>
+			<div class="control large-70 content-left">
+				<input id="email" name="email" type="email" placeholder="me@example.com" ng-model="user.email" required />
+				<div ng-show="loginForm.email.$dirty && loginForm.email.$invalid">
+					<p class="tip error" ng-show="loginForm.email.$error.required">Please enter your email address</p>
+					<p class="tip error" ng-show="loginForm.email.$error.email">This is not a valid email address</p>
+				</div>
+			</div>
+		</div>
+		<div class="control-group column-group gutters">
+			<label for="password" class="large-30 content-right">Password:</label>
+			<div class="control large-70 content-left">
+				<input id="password" name="password" type="password" placeholder="Something cryptic" ng-model="user.password" required ng-minlength=8 />
+				<div ng-show="loginForm.password.$dirty && loginForm.email.$invalid">
+					<p class="tip error" ng-show="loginForm.password.$error.required">Please enter a password</p>
+					<p class="tip error" ng-show="loginForm.password.$error.minlength">Your password should be at least 8 characters long</p>
+				</div>
+			</div>
+		</div>
+		<fieldset class="column-group gutters">
+			<div class="control-group large-20 push-right">
+				<div class="control">
+					<input id="submit" type="submit" class="ink-button blue" value="Login" ng-disabled="loginForm.$invalid || loginForm.$unchanged" ng-click="login(user)" />
+				</div>
+			</div>
+			<div class="control-group large-20 push-right">
+				<div class="control">
+					<input id="signup" type="submit" class="ink-button green" value="Signup" ng-disabled="loginForm.$invalid || loginForm.$unchanged" ng-click="signup(user)" />
+				</div>
+			</div>
+		</fieldset>
+	</form>
+</div>

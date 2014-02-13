@@ -34,3 +34,12 @@ i.notReady {
 i.notReady:hover {
     cursor: wait;
 }
+
+/* Forms */
+form input.ng-invalid.ng-dirty {
+    background-color: #FFB2B2;
+}
+
+form .tip.error {
+    color: #FF4A4A;
+}
