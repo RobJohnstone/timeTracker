@@ -2,6 +2,7 @@ import json
 import datetime
 import baseHandler
 from task import Task
+from user import User
 
 class Tasks(baseHandler.BaseHandler):
 
@@ -19,7 +20,7 @@ class Tasks(baseHandler.BaseHandler):
 			else:
 				startDate = datetime.date(date[0], 12, 1)
 				endDate = datetime.date(date[0] + 1, 1, 1)
-		tasksDict = Task.fetchTasks(startDate, endDate, 1000)
+		tasksDict = Task.fetchTasks(startDate, endDate, User.getCurrentUserKey(), 1000)
 
 		self.response.write(json.dumps(tasksDict))
 
@@ -31,7 +32,7 @@ class Tasks(baseHandler.BaseHandler):
 			self.response.write(str(data['id']))
 
 		else:
-			key = Task.create(data)
+			key = Task.create(data, User.getCurrentUserKey())
 			self.response.write(str(key.id()))
 
 	def delete(self):

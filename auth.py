@@ -8,7 +8,7 @@ class Auth(baseHandler.BaseHandler):
 		if self.session.get('user'):
 			del self.session['user']
 		data = json.loads(self.request.body)
-		user = User.fetchUser(data.get('email'))
+		user = User.setCurrentUser(data.get('email'))
 		if user:
 			if user.verify(data['password']):
 				self.session['user'] = user.email

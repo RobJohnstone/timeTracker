@@ -1,10 +1,10 @@
 import webapp2
 
 import config
-import Tasks
-import Auth	
-import Signup
-import Logout
+import tasks
+import auth	
+import signup
+import logout
 
 application = webapp2.WSGIApplication([
 	('/api/tasks/.*', tasks.Tasks),

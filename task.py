@@ -1,6 +1,7 @@
 from google.appengine.ext import ndb
 
 import utils
+from user import User
 
 class Task(ndb.Model):
 	date = ndb.DateProperty(indexed=True)
@@ -14,8 +15,8 @@ class Task(ndb.Model):
 		self.put()
 
 	@classmethod
-	def fetchTasks(cls, startDate, endDate, maxResults=100):
-		tasks = Task.query().filter(Task.date >= startDate).filter(Task.date < endDate).fetch(maxResults)
+	def fetchTasks(cls, startDate, endDate, ancestor, maxResults=100):
+		tasks = Task.query(ancestor=ancestor).filter(Task.date >= startDate).filter(Task.date < endDate).fetch(maxResults)
 		tasksDict = {}
 		for task in tasks:
 			taskDate = utils.api_from_py_date(task.date)
@@ -26,11 +27,11 @@ class Task(ndb.Model):
 		return tasksDict
 
 	@classmethod
-	def create(cls, data):
-		newTask = Task()
+	def create(cls, data, parent):
+		newTask = Task(parent=parent)
 		newTask.date = utils.py_from_api_date(data['date'])
 		newTask.task = data['task']
-		return newTask.put() # TODO: give tasks an ancestor based on the user
+		return newTask.put()
 
 	@classmethod
 	def delete(cls, id):

@@ -10,6 +10,7 @@ class User(ndb.Model):
 	hashedPassword = ndb.StringProperty(indexed=False)
 	passwordSalt = ndb.StringProperty(indexed=False)
 	creationDate = ndb.DateTimeProperty(indexed=False)
+	currentUser = None
 
 	def verify(self, password):
 		hashedPassword = security.hash_password(password, 'sha1', self.passwordSalt, passwordPepper)
@@ -33,3 +34,19 @@ class User(ndb.Model):
 		if len(user) == 0:
 			return False
 		return user[0];
+
+	@classmethod
+	def setCurrentUser(cls, email):
+		cls.currentUser = User.fetchUser(email)
+		return cls.currentUser
+
+	@classmethod
+	def getCurrentUser(cls):
+		return cls.currentUser
+
+	@classmethod
+	def getCurrentUserKey(cls):
+		if cls.currentUser:
+			return cls.currentUser.key
+		else:
+			return False
